@@ -2,6 +2,8 @@ package com.academiaNetAPI.demo.controller;
 
 import com.academiaNetAPI.demo.dto.DashboardStats;
 import com.academiaNetAPI.demo.service.DashboardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@Tag(name = "Dashboard", description = "Métricas globales")
 public class DashboardController {
 
     private final DashboardService dashboardService;
@@ -20,6 +23,7 @@ public class DashboardController {
     }
 
     @GetMapping("/stats")
+    @Operation(summary = "Métricas globales del sistema")
     public DashboardStats stats(@RequestParam(required = false) UUID companyId) {
         return dashboardService.stats(companyId);
     }

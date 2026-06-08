@@ -15,9 +15,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * AULAS — espacios físicos o virtuales asignados a un curso (control de capacidad).
- */
 @Entity
 @Table(name = "classrooms")
 @SQLDelete(sql = "UPDATE classrooms SET deleted_at = now() WHERE id = ?")

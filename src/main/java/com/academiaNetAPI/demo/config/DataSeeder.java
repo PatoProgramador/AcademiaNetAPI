@@ -41,11 +41,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-/**
- * Carga datos demo al arrancar (empresa, roles, usuarios, cursos, notas...)
- * reproduciendo el contenido mock del front. Se omite si ya hay datos o si
- * academianet.seed.enabled=false.
- */
 @Component
 @ConditionalOnProperty(name = "academianet.seed.enabled", havingValue = "true", matchIfMissing = true)
 public class DataSeeder implements ApplicationRunner {
@@ -103,7 +98,6 @@ public class DataSeeder implements ApplicationRunner {
         }
         log.info("Sembrando datos demo de AcademiaNet...");
 
-        // ── Empresa (tenant raíz) ──
         Company company = new Company();
         company.setName("AcademiaNet Demo University");
         company.setNit("900123456-7");
@@ -115,12 +109,10 @@ public class DataSeeder implements ApplicationRunner {
         company.setActive(true);
         companyRepo.save(company);
 
-        // ── Roles ──
         Role adminRole = role(company, "Administrador", RoleCodes.ADMINISTRATOR, "Gestión total por empresa");
         Role profRole = role(company, "Profesor", RoleCodes.PROFESSOR, "Crea cursos y registra notas");
         Role studentRole = role(company, "Estudiante", RoleCodes.STUDENT, "Se matricula y consulta notas");
 
-        // ── Permisos + RBAC (admin tiene CRUD sobre GRADES) ──
         for (PermissionAction action : PermissionAction.values()) {
             Permission perm = new Permission();
             perm.setCompany(company);
@@ -135,7 +127,6 @@ public class DataSeeder implements ApplicationRunner {
             rolePermissionRepo.save(rp);
         }
 
-        // ── Programa + Aulas + Periodo ──
         Program program = new Program();
         program.setCompany(company);
         program.setName("Ingeniería de Sistemas");
@@ -157,7 +148,6 @@ public class DataSeeder implements ApplicationRunner {
         period.setStatus(PeriodStatus.ACTIVE);
         periodRepo.save(period);
 
-        // ── Usuarios ──
         User admin = user(company, adminRole, "Administrador", "Sistema", "admin@test.com", null, null);
 
         User carlos = user(company, profRole, "Dr. Carlos", "Mendoza", "profesor@test.com", "CC", "10001");
@@ -167,7 +157,6 @@ public class DataSeeder implements ApplicationRunner {
         User sanchez = user(company, profRole, "Ing.", "Sánchez", "sanchez@test.com", "CC", "10005");
         User moreno = user(company, profRole, "Lic.", "Moreno", "moreno@test.com", "CC", "10006");
 
-        // Estudiantes (ALUMNOS_INICIAL del front). Ana usa estudiante@test.com.
         User ana = student(company, studentRole, "Ana", "García López", "estudiante@test.com", "2023001");
         User luis = student(company, studentRole, "Luis", "Ramírez Torres", "luis.ramirez@test.com", "2023002");
         User maria = student(company, studentRole, "María", "Fernández Cruz", "maria.fernandez@test.com", "2023003");
@@ -177,7 +166,6 @@ public class DataSeeder implements ApplicationRunner {
         User valeria = student(company, studentRole, "Valeria", "Reyes Gómez", "valeria.reyes@test.com", "2023007");
         User miguel = student(company, studentRole, "Miguel Ángel", "Soto", "miguel.soto@test.com", "2023008");
 
-        // ── Materias (CURSOS del front) ──
         Subject calculo = subject(company, program, "Cálculo Diferencial e Integral", "MAT-101", 6);
         Subject poo = subject(company, program, "Programación Orientada a Objetos", "INF-203", 5);
         Subject algebra = subject(company, program, "Álgebra Lineal", "MAT-102", 5);
@@ -187,14 +175,12 @@ public class DataSeeder implements ApplicationRunner {
         Subject redes = subject(company, program, "Redes de Computadoras", "INF-401", 4);
         Subject etica = subject(company, program, "Ética Profesional", "HUM-101", 3);
 
-        // Prerrequisito: Estadística requiere Cálculo.
         Prerequisite pre = new Prerequisite();
         pre.setCompany(company);
         pre.setSubject(estadistica);
         pre.setPrerequisite(calculo);
         prerequisiteRepo.save(pre);
 
-        // ── Cursos (instancias de materia en el periodo) ──
         Course cCalculo = course(company, calculo, carlos, period, room201, "Lun-Mié-Vie 08:00");
         Course cPoo = course(company, poo, carlos, period, labB, "Mar-Jue 10:00");
         Course cAlgebra = course(company, algebra, flores, period, room201, "Lun-Mié 12:00");
@@ -204,8 +190,6 @@ public class DataSeeder implements ApplicationRunner {
         course(company, redes, sanchez, period, labB, "Jue 08:00");
         course(company, etica, moreno, period, room201, "Mar 15:00");
 
-        // ── Matrículas + nota de "promedio del curso" en POO (grupo del profesor) ──
-        // Cada alumno (matrícula, asistencia, promedio del front) en el curso de POO de Carlos.
         enrollWithAverage(company, ana, cPoo, period, 95, "8.7");
         enrollWithAverage(company, luis, cPoo, period, 88, "7.5");
         enrollWithAverage(company, maria, cPoo, period, 92, "9.2");
@@ -215,7 +199,6 @@ public class DataSeeder implements ApplicationRunner {
         enrollWithAverage(company, valeria, cPoo, period, 91, "8.5");
         enrollWithAverage(company, miguel, cPoo, period, 70, "6.0");
 
-        // ── Notas recientes de Ana (NOTAS_RECIENTES del front) ──
         Enrollment anaCalc = enroll(company, ana, cCalculo, period, 95);
         Enrollment anaAlg = enroll(company, ana, cAlgebra, period, 95);
         Enrollment anaFis = enroll(company, ana, cFisica, period, 95);
@@ -223,7 +206,7 @@ public class DataSeeder implements ApplicationRunner {
 
         grade(company, anaCalc, carlos, "Examen Parcial 1 – Cálculo", EvaluationType.EXAM,
                 LocalDate.of(2026, 5, 15), "8.5");
-        // La práctica de laboratorio pertenece a POO; Ana ya está matriculada en POO.
+
         Enrollment anaPooEnr = enrollmentRepo.findByStudent(ana).stream()
                 .filter(e -> e.getCourse().getId().equals(cPoo.getId())).findFirst().orElseThrow();
         grade(company, anaPooEnr, carlos, "Práctica de Laboratorio 3", EvaluationType.PRACTICE,
@@ -235,7 +218,6 @@ public class DataSeeder implements ApplicationRunner {
         grade(company, anaBd, torres, "Proyecto: Sistema CRUD", EvaluationType.PROJECT,
                 LocalDate.of(2026, 5, 5), "9.5");
 
-        // ── Historial académico consolidado de Ana ──
         AcademicRecord record = new AcademicRecord();
         record.setCompany(company);
         record.setStudent(ana);
@@ -249,8 +231,6 @@ public class DataSeeder implements ApplicationRunner {
         log.info("Seed completado: 1 empresa, {} usuarios, {} cursos.",
                 userRepo.count(), courseRepo.count());
     }
-
-    // ── Helpers ──
 
     private Role role(Company company, String name, String code, String desc) {
         Role r = new Role();

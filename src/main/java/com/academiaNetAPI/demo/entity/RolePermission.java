@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * ROLES_PERMISOS — pivot N:M entre ROLES y PERMISOS (aislado por empresa).
- */
 @Entity
 @Table(name = "role_permissions", uniqueConstraints = {
         @UniqueConstraint(name = "uk_role_permission",

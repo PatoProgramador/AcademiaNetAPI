@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * PRERREQUISITOS — relación auto-referencial N:M sobre MATERIAS.
- * "subject requiere prerequisite".
- */
 @Entity
 @Table(name = "prerequisites", uniqueConstraints = {
         @UniqueConstraint(name = "uk_prerequisite",

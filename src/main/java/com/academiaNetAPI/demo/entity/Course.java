@@ -16,10 +16,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * CURSOS — nodo central operativo. Instancia de una MATERIA dictada por un
- * PROFESSOR en un PERIODO y un AULA concretos.
- */
 @Entity
 @Table(name = "courses")
 @SQLDelete(sql = "UPDATE courses SET deleted_at = now() WHERE id = ?")
@@ -37,7 +33,6 @@ public class Course extends BaseEntity {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
-    /** USUARIOS con rol PROFESSOR */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     private User professor;
@@ -62,7 +57,6 @@ public class Course extends BaseEntity {
     @Column(name = "available_capacity")
     private Integer availableCapacity;
 
-    /** Horario legible, ej. "Lun-Mié-Vie 08:00" */
     @Column(length = 100)
     private String schedule;
 

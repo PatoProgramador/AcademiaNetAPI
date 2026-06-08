@@ -80,6 +80,19 @@ Contraseña para todos: **`123456`** (igual que el front).
 
 ---
 
+## Documentación interactiva (Swagger / OpenAPI)
+
+Con la app corriendo:
+
+| Recurso | URL |
+|---------|-----|
+| **Swagger UI** | http://localhost:8080/swagger-ui.html |
+| OpenAPI JSON (3.1) | http://localhost:8080/v3/api-docs |
+
+Desde Swagger UI el front puede ver todos los endpoints, sus esquemas de
+request/response y probarlos con **"Try it out"** (mismo origen, sin problemas de CORS).
+Generado con springdoc-openapi 3.0.3.
+
 ## Endpoints
 
 Base: `/api`. El `companyId` es opcional; si se omite se usa la empresa demo.

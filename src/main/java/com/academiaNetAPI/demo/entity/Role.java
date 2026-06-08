@@ -12,9 +12,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * ROLES — perfiles funcionales por empresa (ADMINISTRATOR, PROFESSOR, STUDENT).
- */
 @Entity
 @Table(name = "roles")
 @SQLDelete(sql = "UPDATE roles SET deleted_at = now() WHERE id = ?")
@@ -31,7 +28,6 @@ public class Role extends BaseEntity {
     @Column(nullable = false, length = 60)
     private String name;
 
-    /** ADMINISTRATOR / PROFESSOR / STUDENT */
     @Column(nullable = false, length = 40)
     private String code;
 

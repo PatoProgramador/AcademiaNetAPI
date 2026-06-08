@@ -18,9 +18,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
-/**
- * PERIODOS_ACADEMICOS — ciclo lectivo (semestre/trimestre). Contenedor temporal.
- */
 @Entity
 @Table(name = "academic_periods", uniqueConstraints = {
         @UniqueConstraint(name = "uk_periods_company_code", columnNames = {"company_id", "code"})

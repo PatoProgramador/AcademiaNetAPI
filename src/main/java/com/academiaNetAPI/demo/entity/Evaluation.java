@@ -18,10 +18,6 @@ import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-/**
- * EVALUACIONES — estructura de calificación de un CURSO (parcial 30%, final 40%...).
- * La suma de los porcentajes de un curso debe ser 100.
- */
 @Entity
 @Table(name = "evaluations")
 @SQLDelete(sql = "UPDATE evaluations SET deleted_at = now() WHERE id = ?")

@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/**
- * Resuelve la empresa (tenant) de cada petición. El front no envía empresa,
- * por lo que sin companyId explícito se usa la empresa demo (la primera activa).
- */
 @Service
 public class TenantService {
 

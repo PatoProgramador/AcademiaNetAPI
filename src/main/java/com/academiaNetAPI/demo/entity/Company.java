@@ -13,11 +13,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * EMPRESAS — raíz de la arquitectura multi-tenant.
- * Cada registro es una organización cliente; todas las demás tablas
- * referencian su id mediante company_id.
- */
 @Entity
 @Table(name = "companies", uniqueConstraints = {
         @UniqueConstraint(name = "uk_companies_nit", columnNames = "nit"),

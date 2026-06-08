@@ -1,9 +1,5 @@
 package com.academiaNetAPI.demo.common;
 
-/**
- * Códigos de rol internos (en inglés) y su traducción a los valores que usa el
- * front (App.tsx): "estudiante" | "profesor" | "admin".
- */
 public final class RoleCodes {
 
     public static final String ADMINISTRATOR = "ADMINISTRATOR";
@@ -12,7 +8,6 @@ public final class RoleCodes {
 
     private RoleCodes() {}
 
-    /** Código interno -> valor del front. */
     public static String toFront(String code) {
         if (code == null) return null;
         return switch (code) {
@@ -23,7 +18,6 @@ public final class RoleCodes {
         };
     }
 
-    /** Valor del front -> código interno. Acepta sinónimos comunes. */
     public static String fromFront(String role) {
         if (role == null) return null;
         return switch (role.trim().toLowerCase()) {

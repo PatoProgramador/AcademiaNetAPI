@@ -23,7 +23,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Arranca con el seeder activo sobre H2 y verifica el flujo end-to-end. */
 @SpringBootTest
 @TestPropertySource(properties = "academianet.seed.enabled=true")
 class SeedSmokeTest {
@@ -54,7 +53,7 @@ class SeedSmokeTest {
     @Test
     void seededCatalogIsAvailable() {
         List<UserResponse> users = userService.list(null);
-        assertThat(users).hasSizeGreaterThanOrEqualTo(9); // 1 admin + 6 prof + 8 est, al menos
+        assertThat(users).hasSizeGreaterThanOrEqualTo(9);
 
         List<CourseResponse> courses = courseService.list(null);
         assertThat(courses).hasSize(8);
