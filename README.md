@@ -1,9 +1,7 @@
 # AcademiaNet — Backend (API REST)
 
 Backend del sistema de gestión académica **multi-tenant** AcademiaNet, construido con
-**Spring Boot 4 / Java 21 / PostgreSQL**. Implementa las 15 tablas del MER
-(`Multitenant.html`) con **nombres en inglés** y expone una API compatible con el
-front React (`App.tsx`).
+**Spring Boot 4 / Java 21 / PostgreSQL**.
 
 > Arquitectura multi-tenant: **todas** las tablas tienen `company_id` (antes
 > `empresa_id`) para aislar los datos entre organizaciones. Flujo académico:
@@ -136,45 +134,3 @@ curl -X POST http://localhost:8080/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"estudiante@test.com","password":"123456"}'
 ```
-
----
-
-## Mapeo de tablas y columnas (Español → Inglés)
-
-| MER (español) | Entidad / tabla (inglés) |
-|---------------|--------------------------|
-| EMPRESAS | `Company` / `companies` |
-| ROLES | `Role` / `roles` |
-| PERMISOS | `Permission` / `permissions` |
-| ROLES_PERMISOS | `RolePermission` / `role_permissions` |
-| USUARIOS | `User` / `users` |
-| PROGRAMAS | `Program` / `programs` |
-| MATERIAS | `Subject` / `subjects` |
-| PRERREQUISITOS | `Prerequisite` / `prerequisites` |
-| PERIODOS_ACADEMICOS | `AcademicPeriod` / `academic_periods` |
-| AULAS | `Classroom` / `classrooms` |
-| CURSOS | `Course` / `courses` |
-| EVALUACIONES | `Evaluation` / `evaluations` |
-| MATRICULAS_CURSOS | `Enrollment` / `enrollments` |
-| NOTAS | `Grade` / `grades` |
-| HISTORIAL_ACADEMICO | `AcademicRecord` / `academic_records` |
-
-Columnas: `empresa_id→company_id`, `nombre→name/first_name`, `apellido→last_name`,
-`correo→email`, `documento_*→document_*`, `creditos→credits`, `cupo_maximo→max_capacity`,
-`valor→grade_value`, `publicada→published`, `nota_final→final_grade`, etc.
-Auditoría universal: `created_at`, `updated_at`, `deleted_at` (soft-delete).
-
----
-
-## Notas sobre la compatibilidad con el front
-
-- El front (`App.tsx`) hoy usa datos mock; para conectarlo basta reemplazar esos
-  arreglos por `fetch` a los endpoints anteriores.
-- Tras el login, el front debe **guardar el `token`** (p. ej. en memoria o `localStorage`)
-  y enviarlo en cada llamada con el header `Authorization: Bearer <token>`.
-- El campo `role` de `/api/auth/login` ya viene como `"estudiante" | "profesor" | "admin"`,
-  exactamente los valores del tipo `Role` del front.
-- Las notas se sembraron con `max_value = 10.00` para que coincidan con la escala 0–10
-  que muestra el front (el MER define `5.00` como *default*, no como límite).
-- `attendance_percentage` en `enrollments` es una extensión pragmática del MER para
-  alimentar la columna de asistencia del panel del profesor.
