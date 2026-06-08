@@ -53,18 +53,34 @@ export DB_PASSWORD=academianet
 
 ---
 
+## Despliegue en Render
+
+El repo incluye un blueprint [`render.yaml`](render.yaml) que crea **el Postgres + el web service** (Docker) automáticamente.
+
+1. Sube el repo a GitHub (rama `main`).
+2. En Render: **New → Blueprint**, conecta el repo y elige la rama. Render lee `render.yaml`, crea la base de datos `academianet-db` y el servicio `academianet-api`, e inyecta solas las credenciales de BD y un `JWT_SECRET` aleatorio.
+3. **Apply** y espera el build (compila el Dockerfile multi-stage). La API queda en `https://academianet-api.onrender.com`.
+4. (Opcional) Ajusta `CORS_ALLOWED_ORIGINS` con la URL del front desplegado.
+
+Verifica con `POST https://<tu-servicio>.onrender.com/api/auth/login` y abre `https://<tu-servicio>.onrender.com/swagger-ui.html`.
+
+> Plan free: la BD expira a los 30 días y el servicio se duerme tras inactividad (el primer request lo despierta). El puerto lo gestiona Render con `PORT` (la app ya lo respeta).
+
+---
+
 ## Variables de entorno
 
 | Variable | Default | Descripción |
 |----------|---------|-------------|
-| `DB_URL` | `jdbc:postgresql://localhost:5432/academianet` | URL JDBC |
+| `DB_URL` | _(compuesta)_ | URL JDBC completa; si se define tiene prioridad sobre `DB_HOST/PORT/NAME` |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `academianet` | Componentes de la BD (los usa Render vía `fromDatabase`) |
 | `DB_USERNAME` / `DB_PASSWORD` | `academianet` | Credenciales BD |
 | `JPA_DDL_AUTO` | `update` | Estrategia DDL de Hibernate |
 | `SEED_ENABLED` | `true` | Carga datos demo al arrancar (se omite si ya hay datos) |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Orígenes del front |
-| `JWT_SECRET` | `academianet-dev-secret-…` | Clave de firma HMAC (mín. 32 bytes). **Cambiar en producción** |
+| `JWT_SECRET` | `academianet-dev-secret-…` | Semilla de la clave HMAC (se deriva a 32 bytes con SHA-256). **Cambiar en producción** |
 | `JWT_EXPIRATION_MS` | `86400000` (24 h) | Vigencia del token en ms |
-| `SERVER_PORT` | `8080` | Puerto HTTP |
+| `PORT` / `SERVER_PORT` | `8080` | Puerto HTTP (`PORT` lo fija Render) |
 
 ---
 
