@@ -58,7 +58,6 @@ public class CourseService {
         );
     }
 
-    /** Promedio de las notas de todas las matrículas del curso. */
     private BigDecimal averageForCourse(Course course) {
         List<Grade> grades = enrollmentRepository.findByCourse(course).stream()
                 .map(gradeRepository::findByEnrollment)

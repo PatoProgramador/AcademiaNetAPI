@@ -27,7 +27,6 @@ public class GradeService {
         this.userRepository = userRepository;
     }
 
-    /** Notas publicadas de un estudiante (lo que ve el panel del estudiante). */
     @Transactional(readOnly = true)
     public List<GradeResponse> recentForStudent(UUID studentId) {
         User student = userRepository.findById(studentId)

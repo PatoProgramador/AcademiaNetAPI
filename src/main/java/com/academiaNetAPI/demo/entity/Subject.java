@@ -13,9 +13,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * MATERIAS — tabla maestra del flujo académico. Catálogo estable de asignaturas.
- */
 @Entity
 @Table(name = "subjects", uniqueConstraints = {
         @UniqueConstraint(name = "uk_subjects_company_code", columnNames = {"company_id", "code"})

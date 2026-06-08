@@ -21,7 +21,6 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    /** Login simple (sin JWT): valida email + password y devuelve el usuario. */
     @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findFirstByEmailIgnoreCase(request.email().trim())

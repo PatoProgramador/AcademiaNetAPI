@@ -15,9 +15,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * PERMISOS — acción permitida sobre un recurso (RBAC granular por empresa).
- */
 @Entity
 @Table(name = "permissions")
 @SQLDelete(sql = "UPDATE permissions SET deleted_at = now() WHERE id = ?")

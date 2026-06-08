@@ -16,9 +16,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-/**
- * PROGRAMAS — agrupa MATERIAS en planes de estudio / carreras.
- */
 @Entity
 @Table(name = "programs", uniqueConstraints = {
         @UniqueConstraint(name = "uk_programs_company_code", columnNames = {"company_id", "code"})

@@ -13,11 +13,6 @@ import lombok.Setter;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/**
- * Campos comunes a todas las tablas del modelo multi-tenant:
- * PK uuid + auditoría (created_at, updated_at, deleted_at).
- * El soft-delete se aplica con @SQLDelete / @SQLRestriction en cada entidad.
- */
 @MappedSuperclass
 @Getter
 @Setter

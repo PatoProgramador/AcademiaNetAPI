@@ -16,11 +16,6 @@ import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-/**
- * NOTAS — destino final del flujo (MATRICULA -> NOTA). Calificación de un
- * estudiante en una evaluación. published controla la visibilidad al estudiante.
- * UNIQUE(company_id, enrollment_id, evaluation_id).
- */
 @Entity
 @Table(name = "grades", uniqueConstraints = {
         @UniqueConstraint(name = "uk_grade_enrollment_evaluation",
@@ -45,7 +40,6 @@ public class Grade extends BaseEntity {
     @JoinColumn(name = "evaluation_id", nullable = false)
     private Evaluation evaluation;
 
-    /** USUARIOS con rol PROFESSOR que registra la nota */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     private User professor;

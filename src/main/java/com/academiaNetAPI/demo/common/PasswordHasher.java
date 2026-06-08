@@ -5,10 +5,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-/**
- * Hashing simple SHA-256 (sin dependencias externas). Suficiente para la demo
- * "sin JWT / sesión simple". En producción usar BCrypt/Argon2.
- */
 public final class PasswordHasher {
 
     private PasswordHasher() {}

@@ -19,10 +19,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
-/**
- * MATRICULAS_CURSOS — eslabón central: estudiante matriculado en un curso/periodo.
- * UNIQUE(company_id, student_id, course_id) evita matrículas duplicadas.
- */
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {
         @UniqueConstraint(name = "uk_enrollment_student_course",
@@ -39,7 +35,6 @@ public class Enrollment extends BaseEntity {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    /** USUARIOS con rol STUDENT */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
@@ -63,10 +58,6 @@ public class Enrollment extends BaseEntity {
     @Column(name = "enrollment_type", length = 20)
     private EnrollmentType enrollmentType = EnrollmentType.REGULAR;
 
-    /**
-     * Porcentaje de asistencia (0-100). Extensión pragmática del MER para
-     * alimentar el panel del profesor del front; no aparece en el diagrama.
-     */
     @Column(name = "attendance_percentage")
     private Integer attendancePercentage;
 }

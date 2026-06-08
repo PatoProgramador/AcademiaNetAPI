@@ -17,10 +17,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 
-/**
- * HISTORIAL_ACADEMICO — vista consolidada y persistente del rendimiento del
- * estudiante por materia y periodo (nota final, créditos, estado).
- */
 @Entity
 @Table(name = "academic_records")
 @SQLDelete(sql = "UPDATE academic_records SET deleted_at = now() WHERE id = ?")

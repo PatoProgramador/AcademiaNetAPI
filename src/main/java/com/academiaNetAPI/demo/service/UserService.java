@@ -79,7 +79,7 @@ public class UserService {
     public void delete(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado: " + id));
-        userRepository.delete(user); // soft-delete (@SQLDelete)
+        userRepository.delete(user);
     }
 
     private Role resolveRole(Company company, String frontRole) {
@@ -88,7 +88,6 @@ public class UserService {
                 .orElseThrow(() -> new BadRequestException("El rol '" + frontRole + "' no existe en la empresa."));
     }
 
-    /** Divide "Nombre Apellido(s)" en first_name / last_name. */
     private void applyName(User user, String fullName) {
         String trimmed = fullName.trim().replaceAll("\\s+", " ");
         int idx = trimmed.indexOf(' ');

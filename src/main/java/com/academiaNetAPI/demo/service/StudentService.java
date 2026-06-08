@@ -37,7 +37,6 @@ public class StudentService {
         this.tenantService = tenantService;
     }
 
-    /** Todos los estudiantes de la empresa (panel de gestión de alumnos). */
     @Transactional(readOnly = true)
     public List<StudentResponse> list(UUID companyId) {
         Company company = tenantService.resolve(companyId);
@@ -46,7 +45,6 @@ public class StudentService {
                 .toList();
     }
 
-    /** Estudiantes matriculados en los cursos de un profesor. */
     @Transactional(readOnly = true)
     public List<StudentResponse> listByProfessor(UUID professorId) {
         User professor = userRepository.findById(professorId)

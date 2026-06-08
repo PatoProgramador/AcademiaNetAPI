@@ -15,10 +15,6 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 
-/**
- * USUARIOS — tabla unificada de personas. El rol (rol_id) distingue
- * ADMINISTRATOR / PROFESSOR / STUDENT. Email único por empresa.
- */
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(name = "uk_users_company_email", columnNames = {"company_id", "email"}),
