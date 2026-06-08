@@ -3,6 +3,9 @@ package com.academiaNetAPI.demo.dto;
 import java.util.UUID;
 
 public record AuthResponse(
+        String token,
+        String tokenType,
+        long expiresInMs,
         UUID id,
         String name,
         String email,
