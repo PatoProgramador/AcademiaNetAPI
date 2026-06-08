@@ -4,6 +4,7 @@ import com.academiaNetAPI.demo.dto.AuthResponse;
 import com.academiaNetAPI.demo.dto.LoginRequest;
 import com.academiaNetAPI.demo.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Autenticación", description = "Login simple sin JWT")
+@Tag(name = "Autenticación", description = "Login que emite el token JWT (endpoint público)")
 public class AuthController {
 
     private final AuthService authService;
@@ -23,9 +24,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @SecurityRequirements
     @Operation(summary = "Iniciar sesión",
-            description = "Valida email + password y devuelve el usuario con su rol "
-                    + "(estudiante | profesor | admin). Responde 401 si las credenciales son inválidas.")
+            description = "Endpoint público. Valida email + password y devuelve un token JWT junto "
+                    + "con el usuario y su rol (estudiante | profesor | admin). "
+                    + "Responde 401 si las credenciales son inválidas.")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }

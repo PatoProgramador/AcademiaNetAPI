@@ -16,3 +16,6 @@ academianet:
     enabled: false
   cors:
     allowed-origins: http://localhost:5173
+  jwt:
+    secret: test-secret-academianet-min-32-bytes-0123456789abcdef
+    expiration-ms: 3600000

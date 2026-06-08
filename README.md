@@ -19,7 +19,7 @@ front React (`App.tsx`).
 | Framework | Spring Boot 4.0.6 (Web MVC + Data JPA) |
 | ORM | Hibernate 7 (soft-delete con `@SQLDelete` / `@SQLRestriction`) |
 | Base de datos | PostgreSQL 16 (H2 en memoria para tests) |
-| Auth | Login simple sin JWT (sesión del lado del cliente) |
+| Auth | JWT (Bearer) con Spring Security — stateless |
 | Build | Maven (wrapper incluido) |
 | Contenedores | Dockerfile multi-stage + docker-compose |
 
@@ -64,6 +64,8 @@ export DB_PASSWORD=academianet
 | `JPA_DDL_AUTO` | `update` | Estrategia DDL de Hibernate |
 | `SEED_ENABLED` | `true` | Carga datos demo al arrancar (se omite si ya hay datos) |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Orígenes del front |
+| `JWT_SECRET` | `academianet-dev-secret-…` | Clave de firma HMAC (mín. 32 bytes). **Cambiar en producción** |
+| `JWT_EXPIRATION_MS` | `86400000` (24 h) | Vigencia del token en ms |
 | `SERVER_PORT` | `8080` | Puerto HTTP |
 
 ---
@@ -80,6 +82,22 @@ Contraseña para todos: **`123456`** (igual que el front).
 
 ---
 
+## Autenticación (JWT)
+
+1. `POST /api/auth/login` con `{email, password}` → devuelve `{ token, tokenType: "Bearer", expiresInMs, ... }`.
+2. En cada petición a un endpoint protegido envía el header:
+
+   ```
+   Authorization: Bearer <token>
+   ```
+
+Rutas **públicas** (sin token): `/api/auth/login`, `/v3/api-docs/**`, `/swagger-ui/**`.
+Todo lo demás bajo `/api/**` exige un token válido (responde `401` si falta o es inválido).
+El token incluye `sub` (userId), `email`, `role`, `companyId`, `name` y `exp`. Es **stateless**:
+no hay sesión en el servidor.
+
+En Swagger UI usa el botón **Authorize** y pega el token para probar los endpoints protegidos.
+
 ## Documentación interactiva (Swagger / OpenAPI)
 
 Con la app corriendo:
@@ -95,11 +113,12 @@ Generado con springdoc-openapi 3.0.3.
 
 ## Endpoints
 
-Base: `/api`. El `companyId` es opcional; si se omite se usa la empresa demo.
+Base: `/api`. Todos exigen `Authorization: Bearer <token>` salvo el login.
+El `companyId` es opcional; si se omite se usa la empresa demo.
 
 | Método | Ruta | Descripción | Panel |
 |--------|------|-------------|-------|
-| `POST` | `/api/auth/login` | Login. Devuelve `{id,name,email,role,companyId,companyName}` con `role` ya en formato del front | Login |
+| `POST` | `/api/auth/login` | Login (público). Devuelve `{token,tokenType,expiresInMs,id,name,email,role,companyId,companyName}` | Login |
 | `GET` | `/api/users` | Lista usuarios | Admin |
 | `POST` | `/api/users` | Crea usuario `{name,email,role,password?}` | Admin |
 | `PUT` | `/api/users/{id}` | Edita usuario | Admin |
@@ -151,6 +170,8 @@ Auditoría universal: `created_at`, `updated_at`, `deleted_at` (soft-delete).
 
 - El front (`App.tsx`) hoy usa datos mock; para conectarlo basta reemplazar esos
   arreglos por `fetch` a los endpoints anteriores.
+- Tras el login, el front debe **guardar el `token`** (p. ej. en memoria o `localStorage`)
+  y enviarlo en cada llamada con el header `Authorization: Bearer <token>`.
 - El campo `role` de `/api/auth/login` ya viene como `"estudiante" | "profesor" | "admin"`,
   exactamente los valores del tipo `Role` del front.
 - Las notas se sembraron con `max_value = 10.00` para que coincidan con la escala 0–10
