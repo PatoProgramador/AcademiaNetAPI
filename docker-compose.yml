@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: academianet-db
+    environment:
+      POSTGRES_DB: academianet
+      POSTGRES_USER: academianet
+      POSTGRES_PASSWORD: academianet
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U academianet -d academianet"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: academianet-api
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/academianet
+      DB_USERNAME: academianet
+      DB_PASSWORD: academianet
+      JPA_DDL_AUTO: update
+      SEED_ENABLED: "true"
+      CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:3000"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
