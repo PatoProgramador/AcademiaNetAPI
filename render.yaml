@@ -1,0 +1,49 @@
+databases:
+  - name: academianet-db
+    databaseName: academianet
+    user: academianet
+    plan: free
+
+services:
+  - type: web
+    name: academianet-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /v3/api-docs
+    autoDeploy: true
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: academianet-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: academianet-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: academianet-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: academianet-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: academianet-db
+          property: password
+      # Ajusta la JVM al contenedor free (512 MB) para evitar que el kernel lo mate (OOM).
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=65 -XX:+UseSerialGC -Xss512k"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: "86400000"
+      - key: JPA_DDL_AUTO
+        value: update
+      - key: SEED_ENABLED
+        value: "true"
+      # Reemplazar por la URL del front desplegado (separar varias con comas).
+      - key: CORS_ALLOWED_ORIGINS
+        value: "http://localhost:5173"
