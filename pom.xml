@@ -28,6 +28,14 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<!-- Código sin lógica de negocio: se excluye del % de cobertura de Sonar -->
+		<sonar.coverage.exclusions>
+			**/config/**,
+			**/dto/**,
+			**/entity/**,
+			**/enums/**,
+			**/DemoApplication.java
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>
