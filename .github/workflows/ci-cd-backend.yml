@@ -68,5 +68,5 @@ jobs:
       - name: Actualizar contenedor backend
         run: |
           cd $env:USER_DOCKER_COMPOSE_RELATIVE_PATH
-          docker compose pull backend
-          docker compose up -d backend
+          docker compose pull api
+          docker compose up -d api
