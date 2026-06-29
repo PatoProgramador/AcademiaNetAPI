@@ -66,7 +66,7 @@ jobs:
       USER_DOCKER_COMPOSE_RELATIVE_PATH: ${{ secrets.USER_DOCKER_COMPOSE_RELATIVE_PATH }}
     steps:
       - name: Actualizar contenedor backend
-        run: >
-          cd $USER_DOCKER_COMPOSE_RELATIVE_PATH
+        run: |
+          cd $env:USER_DOCKER_COMPOSE_RELATIVE_PATH
           docker compose pull backend
           docker compose up -d backend
