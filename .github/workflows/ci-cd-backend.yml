@@ -59,12 +59,14 @@ jobs:
       - name: Subir imagen Docker a DockerHub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/academianet-api:latest
 
-#  deploy-backend:
-#    needs: build-backend
-#    runs-on: self-hosted
-#    steps:
-#      - name: Actualizar contenedor backend
-#        run: |
-#          cd /Users/kevinpatino/Downloads/proyecto_docker_compose_limpio
-#          docker compose pull backend
-#          docker compose up -d backend
+  deploy-backend:
+    needs: build-backend
+    runs-on: self-hosted
+    env:
+      USER_DOCKER_COMPOSE_RELATIVE_PATH: ${{ secrets.USER_DOCKER_COMPOSE_RELATIVE_PATH }}
+    steps:
+      - name: Actualizar contenedor backend
+        run: >
+          cd $USER_DOCKER_COMPOSE_RELATIVE_PATH
+          docker compose pull backend
+          docker compose up -d backend
