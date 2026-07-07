@@ -19,13 +19,9 @@ spring:
           time_zone: UTC
     show-sql: ${JPA_SHOW_SQL:false}
 
-  # MongoDB: almacena datos auxiliares de usuario (preferencias y log de actividad).
-  # El User "de verdad" sigue en PostgreSQL; Mongo solo guarda datos flexibles asociados
-  # por userId. La conexión es perezosa: si Mongo no está disponible la app arranca igual
-  # y el registro de actividad se degrada de forma silenciosa.
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/academianet}
+      uri: ${MONGODB_URI:mongodb://mongo:27017/academianet}
       auto-index-creation: true
 
 server:
