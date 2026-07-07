@@ -2,6 +2,8 @@ package com.academianet.demo.config;
 
 import com.academianet.demo.common.PasswordHasher;
 import com.academianet.demo.common.RoleCodes;
+import com.academianet.demo.document.UserActivity;
+import com.academianet.demo.document.UserPreferences;
 import com.academianet.demo.entity.AcademicPeriod;
 import com.academianet.demo.entity.AcademicRecord;
 import com.academianet.demo.entity.Classroom;
@@ -29,6 +31,9 @@ import com.academianet.demo.enums.ProgramLevel;
 import com.academianet.demo.enums.RecordStatus;
 import com.academianet.demo.enums.SubscriptionPlan;
 import com.academianet.demo.repository.*;
+import com.academianet.demo.repository.mongo.UserActivityRepository;
+import com.academianet.demo.repository.mongo.UserPreferencesRepository;
+import com.academianet.demo.service.UserProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -38,8 +43,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Component
 @ConditionalOnProperty(name = "academianet.seed.enabled", havingValue = "true", matchIfMissing = true)
@@ -64,6 +72,8 @@ public class DataSeeder implements ApplicationRunner {
     private final EnrollmentRepository enrollmentRepo;
     private final GradeRepository gradeRepo;
     private final AcademicRecordRepository academicRecordRepo;
+    private final UserPreferencesRepository preferencesRepo;
+    private final UserActivityRepository activityRepo;
 
     public DataSeeder(CompanyRepository companyRepo, RoleRepository roleRepo, PermissionRepository permissionRepo,
                       RolePermissionRepository rolePermissionRepo, UserRepository userRepo, ProgramRepository programRepo,
@@ -71,7 +81,8 @@ public class DataSeeder implements ApplicationRunner {
                       AcademicPeriodRepository periodRepo, ClassroomRepository classroomRepo,
                       CourseRepository courseRepo, EvaluationRepository evaluationRepo,
                       EnrollmentRepository enrollmentRepo, GradeRepository gradeRepo,
-                      AcademicRecordRepository academicRecordRepo) {
+                      AcademicRecordRepository academicRecordRepo,
+                      UserPreferencesRepository preferencesRepo, UserActivityRepository activityRepo) {
         this.companyRepo = companyRepo;
         this.roleRepo = roleRepo;
         this.permissionRepo = permissionRepo;
@@ -87,6 +98,8 @@ public class DataSeeder implements ApplicationRunner {
         this.enrollmentRepo = enrollmentRepo;
         this.gradeRepo = gradeRepo;
         this.academicRecordRepo = academicRecordRepo;
+        this.preferencesRepo = preferencesRepo;
+        this.activityRepo = activityRepo;
     }
 
     @Override
@@ -228,8 +241,54 @@ public class DataSeeder implements ApplicationRunner {
         record.setCreditsEarned(6);
         academicRecordRepo.save(record);
 
+        seedUserProfiles(
+                List.of(admin, carlos, flores, vazquez, torres, sanchez, moreno,
+                        ana, luis, maria, carlosJ, sofia, roberto, valeria, miguel),
+                List.of(admin, carlos, ana));
+
         log.info("Seed completado: 1 empresa, {} usuarios, {} cursos.",
                 userRepo.count(), courseRepo.count());
+    }
+
+    /**
+     * Siembra en MongoDB los datos auxiliares de usuario: preferencias por defecto para todos
+     * los usuarios y un evento de actividad de ejemplo para las cuentas demo. Es best-effort:
+     * si MongoDB no está disponible se omite (solo un warning) sin romper el arranque ni el
+     * seed relacional.
+     */
+    private void seedUserProfiles(List<User> users, List<User> demoAccounts) {
+        try {
+            Instant now = Instant.now();
+            for (User u : users) {
+                UserPreferences prefs = new UserPreferences();
+                prefs.setUserId(u.getId().toString());
+                prefs.setTheme(themeForRole(u.getRole().getCode()));
+                prefs.setLanguage("es");
+                prefs.setEmailNotifications(true);
+                prefs.setTimezone("America/Bogota");
+                prefs.setUpdatedAt(now);
+                preferencesRepo.save(prefs);
+            }
+            for (User u : demoAccounts) {
+                UserActivity activity = new UserActivity();
+                activity.setUserId(u.getId().toString());
+                activity.setType(UserProfileService.ACTIVITY_LOGIN);
+                activity.setDetail("Inicio de sesión de ejemplo (seed)");
+                activity.setTimestamp(now.minus(1, ChronoUnit.HOURS));
+                activityRepo.save(activity);
+            }
+            log.info("Seed Mongo completado: {} preferencias de usuario.", users.size());
+        } catch (RuntimeException ex) {
+            log.warn("Seed Mongo omitido (MongoDB no disponible): {}", ex.getMessage());
+        }
+    }
+
+    private String themeForRole(String roleCode) {
+        return switch (roleCode) {
+            case RoleCodes.ADMINISTRATOR -> "dark";
+            case RoleCodes.PROFESSOR -> "system";
+            default -> "light";
+        };
     }
 
     private Role role(Company company, String name, String code, String desc) {

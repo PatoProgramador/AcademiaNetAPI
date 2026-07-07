@@ -30,6 +30,7 @@ class AuthServiceTest {
 
     @Mock UserRepository userRepository;
     @Mock JwtService jwtService;
+    @Mock UserProfileService userProfileService;
     @InjectMocks AuthService authService;
 
     private User student;

@@ -44,6 +44,11 @@ services:
         value: update
       - key: SEED_ENABLED
         value: "true"
+      # MongoDB (datos auxiliares de usuario: preferencias + actividad). Render no ofrece
+      # Mongo gestionado: crea un cluster gratuito en MongoDB Atlas y pega aquí, desde el
+      # dashboard, la cadena de conexión (mongodb+srv://usuario:pass@host/academianet).
+      - key: MONGODB_URI
+        sync: false
       # Reemplazar por la URL del front desplegado (separar varias con comas).
       - key: CORS_ALLOWED_ORIGINS
         value: "http://localhost:5173"

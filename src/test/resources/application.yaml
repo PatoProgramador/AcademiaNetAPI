@@ -11,6 +11,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
 
+  # No hay Mongo en los tests. Los timeouts cortos (para que el registro de actividad
+  # best-effort falle rápido en vez de bloquear 30 s) se fuerzan con un customizer:
+  # ver com.academianet.demo.support.TestMongoConfig.
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/academianet_test
+      auto-index-creation: false
+
 academianet:
   seed:
     enabled: false

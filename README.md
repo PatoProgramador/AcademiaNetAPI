@@ -17,6 +17,7 @@ Backend del sistema de gestión académica **multi-tenant** AcademiaNet, constru
 | Framework | Spring Boot 4.0.6 (Web MVC + Data JPA) |
 | ORM | Hibernate 7 (soft-delete con `@SQLDelete` / `@SQLRestriction`) |
 | Base de datos | PostgreSQL 16 (H2 en memoria para tests) |
+| Datos auxiliares de usuario | MongoDB 7 (preferencias + log de actividad) |
 | Auth | JWT (Bearer) con Spring Security — stateless |
 | Build | Maven (wrapper incluido) |
 | Contenedores | Dockerfile multi-stage + docker-compose |
@@ -48,8 +49,34 @@ export DB_PASSWORD=academianet
 ### Tests
 
 ```bash
-./mvnw test     # usa H2 en memoria, no requiere Postgres
+./mvnw test     # usa H2 en memoria, no requiere Postgres ni Mongo
 ```
+
+---
+
+## Persistencia políglota: PostgreSQL + MongoDB
+
+El modelo académico (usuarios, cursos, notas, matrículas…) es **relacional** y vive en
+PostgreSQL: el `User` con sus claves foráneas hacia `Enrollment`, `Grade`, `Course` y
+`AcademicRecord` sigue siendo la fuente de verdad de la identidad.
+
+MongoDB se añade **solo para datos auxiliares y flexibles de usuario**, asociados por
+`userId` (el UUID de Postgres, sin duplicar la identidad):
+
+| Colección | Contenido |
+|-----------|-----------|
+| `user_preferences` | Preferencias de UI: `theme`, `language`, `emailNotifications`, `timezone` |
+| `user_activity` | Log de eventos: `LOGIN`, `PREFERENCES_UPDATE`, … con `timestamp` |
+
+La conexión a Mongo es **perezosa y tolerante a fallos**: si Mongo no está disponible la API
+arranca igual, el login funciona y el registro de actividad simplemente se omite (queda un
+warning). Los endpoints de preferencias/actividad sí requieren Mongo.
+
+- **Local (Docker Compose):** el `docker-compose.yml` levanta un servicio `mongo:7` y le pasa
+  a la API `MONGODB_URI=mongodb://mongo:27017/academianet`.
+- **Render:** Render no ofrece Mongo gestionado. Crea un cluster gratuito en
+  [MongoDB Atlas](https://www.mongodb.com/atlas) y define `MONGODB_URI` en el dashboard del
+  servicio (el `render.yaml` ya declara la variable con `sync: false`).
 
 ---
 
@@ -75,6 +102,7 @@ Verifica con `POST https://<tu-servicio>.onrender.com/api/auth/login` y abre `ht
 | `DB_URL` | _(compuesta)_ | URL JDBC completa; si se define tiene prioridad sobre `DB_HOST/PORT/NAME` |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `academianet` | Componentes de la BD (los usa Render vía `fromDatabase`) |
 | `DB_USERNAME` / `DB_PASSWORD` | `academianet` | Credenciales BD |
+| `MONGODB_URI` | `mongodb://localhost:27017/academianet` | Conexión a MongoDB (datos auxiliares de usuario). En Render: cadena de MongoDB Atlas |
 | `JPA_DDL_AUTO` | `update` | Estrategia DDL de Hibernate |
 | `SEED_ENABLED` | `true` | Carga datos demo al arrancar (se omite si ya hay datos) |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Orígenes del front |
@@ -137,6 +165,9 @@ El `companyId` es opcional; si se omite se usa la empresa demo.
 | `POST` | `/api/users` | Crea usuario `{name,email,role,password?}` | Admin |
 | `PUT` | `/api/users/{id}` | Edita usuario | Admin |
 | `DELETE` | `/api/users/{id}` | Elimina (soft-delete) | Admin |
+| `GET` | `/api/users/{id}/preferences` | Preferencias del usuario (MongoDB) | Perfil |
+| `PUT` | `/api/users/{id}/preferences` | Actualiza preferencias `{theme,language,emailNotifications,timezone}` | Perfil |
+| `GET` | `/api/users/{id}/activity` | Log de actividad del usuario (MongoDB) | Perfil |
 | `GET` | `/api/courses` | Lista cursos con promedio calculado | Estudiante |
 | `GET` | `/api/students` | Lista alumnos (`?professorId=` para los de un profesor) | Profesor |
 | `GET` | `/api/students/{id}/grades` | Notas publicadas de un estudiante | Estudiante |
