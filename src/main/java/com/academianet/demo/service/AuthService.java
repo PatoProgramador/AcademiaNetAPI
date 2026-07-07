@@ -18,13 +18,10 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final UserProfileService userProfileService;
 
-    public AuthService(UserRepository userRepository, JwtService jwtService,
-                       UserProfileService userProfileService) {
+    public AuthService(UserRepository userRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
-        this.userProfileService = userProfileService;
     }
 
     @Transactional
@@ -40,10 +37,6 @@ public class AuthService {
         }
 
         user.setLastLogin(OffsetDateTime.now());
-
-        // Log de actividad en MongoDB (best-effort: no bloquea el login si Mongo no responde).
-        userProfileService.recordActivity(user.getId(), UserProfileService.ACTIVITY_LOGIN,
-                "Inicio de sesión correcto");
 
         String token = jwtService.generateToken(user);
 

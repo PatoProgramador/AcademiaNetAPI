@@ -16,19 +16,6 @@ services:
       timeout: 5s
       retries: 10
 
-  mongo:
-    image: mongo:7
-    container_name: academianet-mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodata:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   api:
     image: patoprogramador/academianet-api:latest
     build: .
@@ -37,7 +24,6 @@ services:
       DB_URL: jdbc:postgresql://db:5432/academianet
       DB_USERNAME: academianet
       DB_PASSWORD: academianet
-      MONGODB_URI: mongodb://mongo:27017/academianet
       JPA_DDL_AUTO: update
       SEED_ENABLED: "true"
       CORS_ALLOWED_ORIGINS: "http://localhost:5173,http://localhost:3000"
@@ -48,9 +34,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      mongo:
-        condition: service_healthy
 
 volumes:
   pgdata:
-  mongodata:

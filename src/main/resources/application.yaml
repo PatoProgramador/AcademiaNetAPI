@@ -19,11 +19,6 @@ spring:
           time_zone: UTC
     show-sql: ${JPA_SHOW_SQL:false}
 
-  data:
-    mongodb:
-      uri: mongodb://mongo:27017/academianet
-      auto-index-creation: true
-
 server:
   port: ${PORT:${SERVER_PORT:8080}}
 
