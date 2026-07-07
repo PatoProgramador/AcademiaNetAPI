@@ -21,7 +21,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://mongo:27017/academianet}
+      uri: mongodb://mongo:27017/academianet
       auto-index-creation: true
 
 server:
